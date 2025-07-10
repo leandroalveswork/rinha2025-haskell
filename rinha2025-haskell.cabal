@@ -1,0 +1,87 @@
+cabal-version:      3.4
+name:               rinha2025-haskell
+version:            0.1.0.0
+synopsis:           Implementação da Rinha de Backend de 2025 (Load balancer)
+-- description:
+license:            BSD-3-Clause
+license-file:       LICENSE
+author:             Leandro Alves
+maintainer:         leandroprogramadoruxdesign@gmail.com
+-- copyright:
+category:           System
+extra-doc-files:    CHANGELOG.md
+-- extra-source-files:
+
+library rinha2025-haskell-lib
+    exposed-modules:  Pagamento.ApiLib.Api
+                      , Pagamento.ApiLib.Pagar
+                      , Pagamento.ApiLib.ListarPagamentos
+                      , Pagamento.ApiLib.ObterPagamentoPorId
+                      , Pagamento.CallerLib.Caller
+                      , Pagamento.ViewModelsLib.PaymentsSummaryVM
+                      , Pagamento.ViewModelsLib.PaymentSyncVM
+                      , Pagamento.ViewModelsLib.PaymentVM
+                      , Pagamento.ViewModelsLib.AnyMessageVM
+                      , Pagamento.ViewModelsLib.ServiceHealthVM
+                      , Pagamento.ViewModelsLib.Constants
+                      , Pagamento.ViewModelsLib.Processor
+                      , RepositoryLib.Repository
+    build-depends:    base ^>= 4.20.0.0
+                      , text >= 2.0.2
+                      , aeson >= 2.2.1.0
+                      , mtl >= 2.2.1
+                      , bytestring >= 0.11.4.0
+                      , attoparsec >= 0.14.4
+                      , string-conversions >= 0.4.0.1
+                      , time >= 1.11.1.1
+                      , dotenv >= 0.12.0.0
+                      , warp >= 3.3.31
+                      , wai >= 3.2.4
+                      , servant >= 0.20.3
+                      , servant-server >= 0.20.3
+                      , servant-client >= 0.20.3
+                      , http-client >= 0.7.19
+                      , resource-pool >= 0.4.0.0
+                      , postgresql-simple >= 0.7.0.0
+    hs-source-dirs:   src
+    default-language: Haskell2010
+
+common warnings
+    ghc-options: -Wall
+
+executable rinha2025-haskell
+    import:           warnings
+    main-is:          Main.hs
+    other-modules:    Pagamento.ApiLib.Api
+                      , Pagamento.ApiLib.Pagar
+                      , Pagamento.ApiLib.ListarPagamentos
+                      , Pagamento.ApiLib.ObterPagamentoPorId
+                      , Pagamento.CallerLib.Caller
+                      , Pagamento.ViewModelsLib.PaymentsSummaryVM
+                      , Pagamento.ViewModelsLib.PaymentSyncVM
+                      , Pagamento.ViewModelsLib.PaymentVM
+                      , Pagamento.ViewModelsLib.AnyMessageVM
+                      , Pagamento.ViewModelsLib.ServiceHealthVM
+                      , Pagamento.ViewModelsLib.Constants
+                      , Pagamento.ViewModelsLib.Processor
+                      , RepositoryLib.Repository
+    -- other-extensions:
+    build-depends:    base ^>= 4.20.0.0
+                      , text >= 2.0.2
+                      , aeson >= 2.2.1.0
+                      , mtl >= 2.2.1
+                      , bytestring >= 0.11.4.0
+                      , attoparsec >= 0.14.4
+                      , string-conversions >= 0.4.0.1
+                      , time >= 1.11.1.1
+                      , dotenv >= 0.12.0.0
+                      , warp >= 3.3.31
+                      , wai >= 3.2.4
+                      , servant >= 0.20.3
+                      , servant-server >= 0.20.3
+                      , servant-client >= 0.20.3
+                      , http-client >= 0.7.19
+                      , resource-pool >= 0.4.0.0
+                      , postgresql-simple >= 0.7.0.0
+    hs-source-dirs:   app, src
+    default-language: Haskell2010
