@@ -6,7 +6,7 @@ module Pagamento.CallerLib.Caller (pagarPeloProcessor, obterSaude) where
 
 import Control.Monad.IO.Class (liftIO)
 import Data.Proxy
-import Network.HTTP.Client (newManager, defaultManagerSettings)
+import qualified Network.HTTP.Client as NETWORK 
 import Servant.API
 import Servant.Client
 import Pagamento.ViewModelsLib.AnyMessageVM (AnyMessage)
@@ -27,17 +27,15 @@ api = Proxy
 
 pagarPeloProcessor' :<|> obterSaude' = client api
 
-pagarPeloProcessor :: Processor -> PaymentSync -> IO (Either ClientError AnyMessage)
-pagarPeloProcessor processor paymentSync = do
-  manager' <- liftIO (newManager defaultManagerSettings)
+pagarPeloProcessor :: NETWORK.Manager -> Processor -> PaymentSync -> IO (Either ClientError AnyMessage)
+pagarPeloProcessor manager processor paymentSync = do
   runClientM
     (pagarPeloProcessor' paymentSync) 
-    (mkClientEnv manager' (BaseUrl Http (processorCode processor ++ "-processor-default") 8080 ""))
+    (mkClientEnv manager (BaseUrl Http (processorCode processor ++ "-processor-default") 8080 ""))
 
-obterSaude :: Processor -> IO (Either ClientError ServiceHealth)
-obterSaude processor = do
-  manager' <- liftIO (newManager defaultManagerSettings)
+obterSaude :: NETWORK.Manager -> Processor -> IO (Either ClientError ServiceHealth)
+obterSaude manager processor = do
   runClientM
     obterSaude'
-    (mkClientEnv manager' (BaseUrl Http (processorCode processor ++ "-processor-default") 8080 ""))
+    (mkClientEnv manager (BaseUrl Http (processorCode processor ++ "-processor-default") 8080 ""))
 

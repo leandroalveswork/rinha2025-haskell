@@ -13,7 +13,9 @@ module Pagamento.ApiLib.Api
 import qualified Data.Time as TIME
 import qualified Data.Pool as DP
 import qualified Database.PostgreSQL.Simple as SQL
+import qualified Network.HTTP.Client as NETWORK
 import Servant
+import Servant.Client
 import Pagamento.ViewModelsLib.PaymentVM (Payment)
 import Pagamento.ViewModelsLib.PaymentSyncVM (PaymentSync)
 import Pagamento.ViewModelsLib.PaymentsSummaryVM (PaymentsSummary)
@@ -28,8 +30,8 @@ type PagamentoApi = "payments" :> ReqBody '[JSON] Payment
   :<|> "payments" :> Capture "id" Int
      :> Get '[JSON] PaymentSync
 
-pagamentoServidor :: DP.Pool SQL.Connection -> Server PagamentoApi
-pagamentoServidor conns = pagar conns
+pagamentoServidor :: DP.Pool SQL.Connection -> NETWORK.Manager -> Server PagamentoApi
+pagamentoServidor conns manager = pagar conns manager
   :<|> listarPagamentos conns
   :<|> obterPagamentoPorId conns
 

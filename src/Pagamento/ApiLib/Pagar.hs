@@ -8,6 +8,7 @@ module Pagamento.ApiLib.Pagar
 import Data.Text (Text, pack)
 import qualified Data.Time as TIME
 import Control.Monad.IO.Class (liftIO)
+import qualified Network.HTTP.Client as NETWORK 
 import qualified Data.Pool as DP
 import qualified Database.PostgreSQL.Simple as SQL
 import qualified Servant as S
@@ -17,10 +18,10 @@ import Pagamento.ViewModelsLib.Processor (Processor(Default_))
 import Pagamento.CallerLib.Caller (pagarPeloProcessor)
 import GHC.Float (fromRat)
 
-pagar :: DP.Pool SQL.Connection -> Payment -> S.Handler S.NoContent
-pagar conns pagamento = do
+pagar :: DP.Pool SQL.Connection -> NETWORK.Manager -> Payment -> S.Handler S.NoContent
+pagar conns manager pagamento = do
   requestedAt <- liftIO TIME.getCurrentTime
-  _ <- liftIO $ pagarPeloProcessor Default_ (fromPaymentVM pagamento requestedAt)
+  _ <- liftIO $ pagarPeloProcessor manager Default_ (fromPaymentVM pagamento requestedAt)
   -- TODO: Apenas inserir com Finished = 1 se der o codigo 200
   -- Se ficar sem ter processado, preencher next retry
   _ <- liftIO $

@@ -1,13 +1,14 @@
 module Main where
 
-import Data.Maybe                  (fromMaybe)
-import Text.Read                   (readMaybe)
+import Data.Maybe (fromMaybe)
+import Text.Read (readMaybe)
+import Control.Monad.IO.Class (liftIO)
 import Network.Wai.Handler.Warp
 import Servant
---import qualified Data.Pool as DP
 import qualified Configuration.Dotenv as ENV
-import Pagamento.ApiLib.Api        (PagamentoApi, pagamentoServidor)
-import RepositoryLib.Repository    (migrateDB, initConnectionPool, dotenvConnstr)
+import qualified Network.HTTP.Client as NETWORK 
+import Pagamento.ApiLib.Api (PagamentoApi, pagamentoServidor)
+import RepositoryLib.Repository (migrateDB, initConnectionPool, dotenvConnstr)
 
 proxyServidor :: Proxy PagamentoApi
 proxyServidor = Proxy
@@ -26,5 +27,6 @@ main = do
   connstr <- dotenvConnstr
   exposedport <- dotenvExposedport
   pool <- initConnectionPool connstr
+  manager' <- liftIO (NETWORK.newManager NETWORK.defaultManagerSettings)
   migrateDB connstr
-  run exposedport (serve proxyServidor $ pagamentoServidor pool)
+  run exposedport (serve proxyServidor $ pagamentoServidor pool manager')
