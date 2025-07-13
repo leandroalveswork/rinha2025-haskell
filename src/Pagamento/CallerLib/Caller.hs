@@ -31,11 +31,11 @@ pagarPeloProcessor :: NETWORK.Manager -> Processor -> PaymentSync -> IO (Either 
 pagarPeloProcessor manager processor paymentSync = do
   runClientM
     (pagarPeloProcessor' paymentSync) 
-    (mkClientEnv manager (BaseUrl Http (processorCode processor ++ "-processor-default") 8080 ""))
+    (mkClientEnv manager (BaseUrl Http ("payment-processor-" ++ processorCode processor) 8080 ""))
 
 obterSaude :: NETWORK.Manager -> Processor -> IO (Either ClientError ServiceHealth)
 obterSaude manager processor = do
   runClientM
     obterSaude'
-    (mkClientEnv manager (BaseUrl Http (processorCode processor ++ "-processor-default") 8080 ""))
+    (mkClientEnv manager (BaseUrl Http ("payment-processor-" ++ processorCode processor) 8080 ""))
 
