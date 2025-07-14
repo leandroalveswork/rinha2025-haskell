@@ -15,7 +15,6 @@ import qualified Data.Pool as DP
 import qualified Database.PostgreSQL.Simple as SQL
 import qualified Network.HTTP.Client as NETWORK
 import Servant
-import Servant.Client
 import Pagamento.ViewModelsLib.PaymentVM (Payment)
 import Pagamento.ViewModelsLib.PaymentSyncVM (PaymentSync)
 import Pagamento.ViewModelsLib.PaymentsSummaryVM (PaymentsSummary)

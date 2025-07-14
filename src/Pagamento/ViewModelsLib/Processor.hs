@@ -3,7 +3,13 @@ module Pagamento.ViewModelsLib.Processor
   , processorCode
   , processorId
   , getProcessorToSync
+  , retentarIntervalo
+  , safeAmountsArray
   ) where
+
+import Data.Scientific
+import qualified Data.List as DL
+import qualified Data.Time as TIME
 
 data Processor = Default_ | Fallback
   deriving (Eq)
@@ -19,8 +25,8 @@ processorId Fallback = 2
 retriesBeforeFallback :: Int
 retriesBeforeFallback = 6
 
---                                  allAmounts deve ficar ordenado de forma decrescente
-getProcessorToSync :: Int -> Int -> [Int] -> Processor
+--                                         allAmounts deve ficar ordenado de forma decrescente
+getProcessorToSync :: Int -> Scientific -> [Scientific] -> Processor
 getProcessorToSync previousRetries amount allAmounts 
   | previousRetries == 0 = Default_
   | previousRetries >= retriesBeforeFallback = Fallback
@@ -32,4 +38,12 @@ getProcessorToSync previousRetries amount allAmounts
   in if amount >= (allAmounts !! safeLeastIndex)
         then Fallback
         else Default_
+
+retentarIntervalo :: TIME.NominalDiffTime
+retentarIntervalo = TIME.secondsToNominalDiffTime 15
+
+safeAmountsArray :: [Scientific] -> [Scientific]
+safeAmountsArray xs
+  | length xs <= 6 = (reverse . DL.sort) ([1, 10, 100, 1000, 10000, 100000] ++ xs)
+  | otherwise = xs
 

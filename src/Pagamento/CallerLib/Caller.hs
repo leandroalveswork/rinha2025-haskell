@@ -4,11 +4,10 @@
 
 module Pagamento.CallerLib.Caller (pagarPeloProcessor, obterSaude) where
 
-import Control.Monad.IO.Class (liftIO)
 import Data.Proxy
 import qualified Network.HTTP.Client as NETWORK 
+import qualified Servant.Client as SCLI
 import Servant.API
-import Servant.Client
 import Pagamento.ViewModelsLib.AnyMessageVM (AnyMessage)
 import Pagamento.ViewModelsLib.PaymentSyncVM (PaymentSync)
 import Pagamento.ViewModelsLib.ServiceHealthVM (ServiceHealth)
@@ -19,23 +18,23 @@ type ProcessorApi = "payments" :> ReqBody '[JSON] PaymentSync
   :<|> "payments" :> "service-health" 
     :> Get '[JSON] ServiceHealth
 
-pagarPeloProcessor' :: PaymentSync -> ClientM AnyMessage
-obterSaude' :: ClientM ServiceHealth
+pagarPeloProcessor' :: PaymentSync -> SCLI.ClientM AnyMessage
+obterSaude' :: SCLI.ClientM ServiceHealth
 
 api :: Proxy ProcessorApi
 api = Proxy
 
-pagarPeloProcessor' :<|> obterSaude' = client api
+pagarPeloProcessor' :<|> obterSaude' = SCLI.client api
 
-pagarPeloProcessor :: NETWORK.Manager -> Processor -> PaymentSync -> IO (Either ClientError AnyMessage)
+pagarPeloProcessor :: NETWORK.Manager -> Processor -> PaymentSync -> IO (Either SCLI.ClientError AnyMessage)
 pagarPeloProcessor manager processor paymentSync = do
-  runClientM
+  SCLI.runClientM
     (pagarPeloProcessor' paymentSync) 
-    (mkClientEnv manager (BaseUrl Http ("payment-processor-" ++ processorCode processor) 8080 ""))
+    (SCLI.mkClientEnv manager (SCLI.BaseUrl SCLI.Http ("payment-processor-" ++ processorCode processor) 8080 ""))
 
-obterSaude :: NETWORK.Manager -> Processor -> IO (Either ClientError ServiceHealth)
+obterSaude :: NETWORK.Manager -> Processor -> IO (Either SCLI.ClientError ServiceHealth)
 obterSaude manager processor = do
-  runClientM
+  SCLI.runClientM
     obterSaude'
-    (mkClientEnv manager (BaseUrl Http ("payment-processor-" ++ processorCode processor) 8080 ""))
+    (SCLI.mkClientEnv manager (SCLI.BaseUrl SCLI.Http ("payment-processor-" ++ processorCode processor) 8080 ""))
 

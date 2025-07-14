@@ -12,6 +12,7 @@ import qualified Data.Pool as DP
 import qualified Database.PostgreSQL.Simple as SQL
 import qualified Servant as S
 import qualified Data.Time as TIME
+import Data.Scientific
 import Pagamento.ViewModelsLib.PaymentsSummaryVM 
   ( PaymentsSummary(PaymentsSummary)
   , default_, fallback, zeroedSummary
@@ -31,7 +32,7 @@ listarPagamentos conns de ate = do
         <> "  GROUP BY TunnelId;"
         )
         (de, ate)
-        :: IO [(Int, Rational, Int)])
+        :: IO [(Int, Scientific, Int)])
 
   (let sumarioDefault :: PaymentSummary
        sumarioDefault = DM.fromMaybe zeroedSummary 

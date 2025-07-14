@@ -8,10 +8,11 @@ module Pagamento.ViewModelsLib.PaymentVM
 
 import Data.Aeson
 import GHC.Generics
+import Data.Scientific
 
 data Payment = Payment
   { correlationId :: String
-  , amount :: Rational
+  , amount :: Scientific
   } deriving Generic
 
 instance ToJSON Payment

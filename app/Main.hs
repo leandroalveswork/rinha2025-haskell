@@ -16,7 +16,7 @@ proxyServidor = Proxy
 dotenvExposedport :: IO Int
 dotenvExposedport = do
   vars <- ENV.parseFile ".env"
-  let port = fromMaybe "80" (lookup "RINHAFX_PORT" vars)
+  let port = fromMaybe "80" (lookup "RINHA_HASKELL_PORT" vars)
   let validatedPort = readMaybe port
   case validatedPort of
     Nothing        -> fail "Falha ao ler porta configurada"

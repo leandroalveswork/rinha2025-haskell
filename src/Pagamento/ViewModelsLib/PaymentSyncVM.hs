@@ -11,12 +11,13 @@ module Pagamento.ViewModelsLib.PaymentSyncVM
 import qualified Data.Time as TIME
 import Data.Aeson
 import GHC.Generics
+import Data.Scientific
 
 import qualified Pagamento.ViewModelsLib.PaymentVM as PAYVM
 
 data PaymentSync = PaymentSync
   { correlationId :: String
-  , amount :: Rational
+  , amount :: Scientific
   , requestedAt :: TIME.UTCTime
   } deriving Generic
 

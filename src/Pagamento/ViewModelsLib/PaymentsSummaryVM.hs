@@ -13,10 +13,11 @@ module Pagamento.ViewModelsLib.PaymentsSummaryVM
 import Data.Aeson
 import Data.Aeson.Key (fromString)
 import GHC.Generics
+import Data.Scientific
 
 data PaymentSummary = PaymentSummary
   { totalRequests :: Int
-  , totalAmount :: Rational
+  , totalAmount :: Scientific
   } deriving Generic
 
 instance ToJSON PaymentSummary
