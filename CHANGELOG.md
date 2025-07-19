@@ -1,5 +1,5 @@
 # Revision history for rinha2025-haskell
 
-## 0.1.0.0 -- YYYY-mm-dd
+## 1.0.0.0 -- 2025-07-15
 
-* First version. Released on an unsuspecting world.
+* Primeira versão: APIs de pagar e sumarizar, retentativas, analise de quantias

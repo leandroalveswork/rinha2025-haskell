@@ -12,7 +12,11 @@ category:           System
 extra-doc-files:    CHANGELOG.md
 -- extra-source-files:
 
+common sharedfind
+    ghc-options: -dynamic -dynload deploy
+
 library rinha2025-haskell-lib
+    -- import:          sharedfind
     exposed-modules:  Pagamento.ApiLib.Api
                       , Pagamento.ApiLib.Pagar
                       , Pagamento.ApiLib.ListarPagamentos
@@ -52,6 +56,7 @@ common warnings
 
 executable rinha2025-haskell
     import:           warnings
+    -- import:           warnings -- , sharedfind
     main-is:          Main.hs
     other-modules:    Pagamento.ApiLib.Api
                       , Pagamento.ApiLib.Pagar
