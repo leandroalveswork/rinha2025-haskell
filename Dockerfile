@@ -23,7 +23,6 @@ RUN cp $(cabal-plan list-bin rinha2025-haskell) ./bin
 COPY .env.prd ./bin/.env
 
 FROM base AS production
-COPY --from=build / ./www-data
 COPY --from=build /servidor/bin ./rinha2025-haskell/
 WORKDIR /rinha2025-haskell
 COPY --from=build /servidor/bin/.env ./.env
