@@ -2,8 +2,8 @@ CREATE TABLE IF NOT EXISTS PAYMENTS
   ( PaymentId SERIAL PRIMARY KEY
   , Code VARCHAR(36) NOT NULL
   , Amount DECIMAL NOT NULL
-  , CreateTimestamp TIMESTAMPZ NOT NULL
-  , NextRetryTimestamp TIMESTAMPZ
+  , CreateTimestamp TIMESTAMP NOT NULL
+  , NextRetryTimestamp TIMESTAMP
   , Retries SMALLINT NOT NULL
   , Finished SMALLINT NOT NULL
   , ProcessorId SMALLSERIAL
