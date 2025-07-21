@@ -1,14 +1,14 @@
 services:
   api01: &api
     build: .
-    hostname: api-01
+    hostname: wired-api-01
     expose:
       - 80
     depends_on:
       db:
         condition: service_healthy
     networks:
-      - backend
+      - wired
       - payment-processor
     deploy:
       resources:
@@ -18,7 +18,7 @@ services:
   
   api02:
     <<: *api
-    hostname: api-02
+    hostname: wired-api-02
     expose:
       - 80
     depends_on:
@@ -42,7 +42,7 @@ services:
     ports:
       - "9999:9999"
     networks:
-      - backend
+      - wired
       - payment-processor
     deploy:
       resources:
@@ -52,7 +52,7 @@ services:
 
   db:
     image: postgres:17.5
-    hostname: db
+    hostname: wired-db
     environment:
       POSTGRES_DB: rinha_haskell
       POSTGRES_USER: root
@@ -60,7 +60,7 @@ services:
     ports:
       - "5434:5432"
     networks:
-      - backend
+      - wired
     volumes:
       - /var/run/postgresql
     command: postgres
@@ -77,8 +77,8 @@ services:
           memory: "110MB"
 
 networks:
-  backend:
-    name: backend
+  wired:
+    name: wired
     driver: bridge
   payment-processor:
     external: true
