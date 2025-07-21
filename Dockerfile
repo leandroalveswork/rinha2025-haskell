@@ -12,25 +12,23 @@ COPY CHANGELOG.md ./
 COPY LICENSE ./
 COPY app ./app/
 COPY src ./src/
+
 RUN cabal user-config update
-RUN cabal configure \
-#  -O0 \
-   --extra-lib-dirs=/usr/lib/x86_64-linux-gnu \
-   --enable-shared
-#  --enable-executable-dynamic
-#  --enable-shared  --enable-executable-dynamic
+RUN cabal update
+RUN cabal install cabal-plan --constraint='cabal-plan +exe'
 
-RUN cabal update && cabal install rinha2025-haskell \
-  --installdir=/bin
-COPY .env.prd /bin/
-RUN mv /bin/.env.prd /bin/.env
+RUN cabal build
+RUN mkdir ./bin
+RUN cp $(cabal-plan list-bin rinha2025-haskell) ./bin
+COPY .env.prd ./bin/.env
 
-FROM base
-# COPY --from=build /servidor ./
-COPY --from=build /bin ./
-COPY --from=build /bin/.env ./bin/.env
+FROM base AS production
+COPY --from=build / ./www-data
+COPY --from=build /servidor/bin ./rinha2025-haskell/
+WORKDIR /rinha2025-haskell
+COPY --from=build /servidor/bin/.env ./.env
 
 EXPOSE 80
 
 USER www-data:www-data
-ENTRYPOINT ["rinha2025-haskell --verbose"]
+ENTRYPOINT ["./rinha2025-haskell"]

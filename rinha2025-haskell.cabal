@@ -1,4 +1,4 @@
-cabal-version:      3.4
+cabal-version:      3.12
 name:               rinha2025-haskell
 version:            0.1.0.0
 synopsis:           Implementação da Rinha de Backend de 2025 (Load balancer)
@@ -13,10 +13,10 @@ extra-doc-files:    CHANGELOG.md
 -- extra-source-files:
 
 common sharedfind
-    ghc-options: -dynamic -dynload deploy
+    ghc-options: -dynload deploy
 
 library rinha2025-haskell-lib
-    -- import:          sharedfind
+    import:          sharedfind
     exposed-modules:  Pagamento.ApiLib.Api
                       , Pagamento.ApiLib.Pagar
                       , Pagamento.ApiLib.ListarPagamentos
@@ -55,8 +55,8 @@ common warnings
     ghc-options: -Wall
 
 executable rinha2025-haskell
-    import:           warnings
-    -- import:           warnings -- , sharedfind
+    -- import:           warnings
+    import:           warnings, sharedfind
     main-is:          Main.hs
     other-modules:    Pagamento.ApiLib.Api
                       , Pagamento.ApiLib.Pagar
