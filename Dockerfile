@@ -27,6 +27,10 @@ COPY --from=build /servidor/bin ./rinha2025-haskell/
 WORKDIR /rinha2025-haskell
 COPY --from=build /servidor/bin/.env ./.env
 
+RUN mkdir ./src
+RUN mkdir ./src/RepositoryLib
+COPY src/RepositoryLib/*.sql ./src/RepositoryLib
+
 EXPOSE 80
 
 USER www-data:www-data
