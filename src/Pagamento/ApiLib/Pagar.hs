@@ -23,7 +23,6 @@ import Data.Scientific
 pagar :: DP.Pool SQL.Connection -> NETWORK.Manager -> PAGVM.Payment -> S.Handler S.NoContent
 pagar conns manager pagamento = do
   requestedAt' <- liftIO TIME.getCurrentTime
-  liftIO $ putStrLn "Rinha> API Pagar"
   pagamentoSync <- return $ fromPaymentVM pagamento requestedAt'
   _ <- liftIO $
     DP.withResource conns $ \conn ->

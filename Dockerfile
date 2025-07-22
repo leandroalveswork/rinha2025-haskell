@@ -20,7 +20,13 @@ RUN cabal install cabal-plan --constraint='cabal-plan +exe'
 RUN cabal build
 RUN mkdir ./bin
 RUN cp $(cabal-plan list-bin rinha2025-haskell) ./bin
-COPY .env.prd ./bin/.env
+
+ARG HEAD_SERVER=1
+ARG STAGE
+COPY .env.$STAGE ./bin/.env
+RUN cat ./bin/.env | sed "s/HEAD_SERVER=1/HEAD_SERVER=$HEAD_SERVER/" > ./bin/.env.tmp
+RUN rm ./bin/.env
+RUN mv ./bin/.env.tmp ./bin/.env
 
 FROM base AS production
 COPY --from=build /servidor/bin ./rinha2025-haskell/

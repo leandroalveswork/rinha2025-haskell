@@ -22,11 +22,22 @@ dotenvExposedport = do
     Nothing        -> fail "Falha ao ler porta configurada"
     Just validPort -> return validPort
 
+dotenvHeadServer :: IO Bool
+dotenvHeadServer = do
+  vars <- ENV.parseFile ".env"
+  let headServer = fromMaybe "1" (lookup "HEAD_SERVER" vars)
+  let validatedHeadServer = (readMaybe headServer) :: Maybe Int
+  case validatedHeadServer of
+    Nothing              -> fail "Falha ao determinar se o servidor é o HEAD"
+    Just validHeadServer -> return $ validHeadServer == 1
+
 main :: IO ()
 main = do
   connstr <- dotenvConnstr
   exposedport <- dotenvExposedport
+  headServer <- dotenvHeadServer
+
   pool <- initConnectionPool connstr
   manager' <- liftIO (NETWORK.newManager NETWORK.defaultManagerSettings)
-  migrateDB connstr
+  migrateDB headServer connstr
   run exposedport (serve proxyServidor $ pagamentoServidor pool manager')

@@ -29,8 +29,11 @@ getFileLines fileName = do
 getFileContentAsSql :: String -> IO SQL.Query
 getFileContentAsSql = fmap ((fromString  . DL.intercalate " ")) . getFileLines
 
-migrateDB :: DBConnectionString -> IO ()
-migrateDB connstr = bracket (SQL.connectPostgreSQL $ connstr) SQL.close $ \conn -> do
+migrateDB :: Bool -> DBConnectionString -> IO ()
+migrateDB headserver connstr = if headserver then _migrateDB connstr else return ()
+
+_migrateDB :: DBConnectionString -> IO ()
+_migrateDB connstr = bracket (SQL.connectPostgreSQL $ connstr) SQL.close $ \conn -> do
   versionManagerQuery <- getFileContentAsSql "VERSION_MANAGER.sql"
   versions <- fmap (map SQL.fromOnly)
     $ ((SQL.query_ conn versionManagerQuery)::(IO [SQL.Only String]))
