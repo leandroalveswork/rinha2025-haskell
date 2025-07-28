@@ -1,6 +1,6 @@
-cabal-version:      3.12
+cabal-version:      3.4
 name:               rinha2025-haskell
-version:            0.1.0.0
+version:            0.8.1
 synopsis:           Implementação da Rinha de Backend de 2025 (Load balancer)
 -- description:
 license:            BSD-3-Clause
