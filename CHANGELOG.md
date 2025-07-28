@@ -7,3 +7,7 @@
 ## 0.8.1 -- 2025-07-21
 
 * CI/CD completo
+
+## 0.8.2 -- 2025-07-28
+
+* Arquivos de automação do Nix de SUBIDA e PARADA do processor-container e Postgres
