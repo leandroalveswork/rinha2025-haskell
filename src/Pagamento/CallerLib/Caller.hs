@@ -11,7 +11,8 @@ import Servant.API
 import Pagamento.ViewModelsLib.AnyMessageVM (AnyMessage)
 import Pagamento.ViewModelsLib.PaymentSyncVM (PaymentSync)
 import Pagamento.ViewModelsLib.ServiceHealthVM (ServiceHealth)
-import Pagamento.ViewModelsLib.Processor (processorCode, Processor)
+import Pagamento.ViewModelsLib.Processor (processorCode, Processor(Default_))
+import Pagamento.ViewModelsLib.AppSettingsVM (AppSettings, defaultHostname, defaultPort, fallbackHostname, fallbackPort)
 
 type ProcessorApi = "payments" :> ReqBody '[JSON] PaymentSync 
     :> Post '[JSON] AnyMessage
@@ -26,15 +27,19 @@ api = Proxy
 
 pagarPeloProcessor' :<|> obterSaude' = SCLI.client api
 
-pagarPeloProcessor :: NETWORK.Manager -> Processor -> PaymentSync -> IO (Either SCLI.ClientError AnyMessage)
-pagarPeloProcessor manager processor paymentSync = do
+pagarPeloProcessor :: NETWORK.Manager -> AppSettings -> Processor -> PaymentSync -> IO (Either SCLI.ClientError AnyMessage)
+pagarPeloProcessor manager appSettings processor paymentSync = do
+  let hostname = if processor == Default_ then defaultHostname appSettings else fallbackHostname appSettings
+  let port = if processor == Default_ then defaultPort appSettings else fallbackPort appSettings
   SCLI.runClientM
     (pagarPeloProcessor' paymentSync) 
-    (SCLI.mkClientEnv manager (SCLI.BaseUrl SCLI.Http ("payment-processor-" ++ processorCode processor) 8080 ""))
+    (SCLI.mkClientEnv manager (SCLI.BaseUrl SCLI.Http hostname port "payments"))
 
-obterSaude :: NETWORK.Manager -> Processor -> IO (Either SCLI.ClientError ServiceHealth)
-obterSaude manager processor = do
+obterSaude :: NETWORK.Manager -> AppSettings -> Processor -> IO (Either SCLI.ClientError ServiceHealth)
+obterSaude manager appSettings processor = do
+  let hostname = if processor == Default_ then defaultHostname appSettings else fallbackHostname appSettings
+  let port = if processor == Default_ then defaultPort appSettings else fallbackPort appSettings
   SCLI.runClientM
     obterSaude'
-    (SCLI.mkClientEnv manager (SCLI.BaseUrl SCLI.Http ("payment-processor-" ++ processorCode processor) 8080 ""))
+    (SCLI.mkClientEnv manager (SCLI.BaseUrl SCLI.Http hostname port "payments"))
 

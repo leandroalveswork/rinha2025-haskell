@@ -9,6 +9,7 @@ import Data.Text (Text, pack)
 import Data.Fixed (HasResolution (resolution))
 import Control.Monad.IO.Class (liftIO)
 import Control.Concurrent (forkIO, threadDelay)
+import Data.Scientific
 import qualified Data.Time as TIME
 import qualified Network.HTTP.Client as NETWORK 
 import qualified Data.Pool as DP
@@ -18,10 +19,10 @@ import qualified Pagamento.ViewModelsLib.PaymentVM as PAGVM
 import Pagamento.ViewModelsLib.PaymentSyncVM (PaymentSync, fromPaymentVM, correlationId, amount, requestedAt)
 import Pagamento.ViewModelsLib.Processor (Processor(Default_), processorId, getProcessorToSync, retentarIntervalo, safeAmountsArray)
 import Pagamento.CallerLib.Caller (pagarPeloProcessor)
-import Data.Scientific
+import Pagamento.ViewModelsLib.AppSettingsVM (AppSettings)
 
-pagar :: DP.Pool SQL.Connection -> NETWORK.Manager -> PAGVM.Payment -> S.Handler S.NoContent
-pagar conns manager pagamento = do
+pagar :: DP.Pool SQL.Connection -> NETWORK.Manager -> AppSettings -> PAGVM.Payment -> S.Handler S.NoContent
+pagar conns manager appSettings pagamento = do
   requestedAt' <- liftIO TIME.getCurrentTime
   pagamentoSync <- return $ fromPaymentVM pagamento requestedAt'
   _ <- liftIO $
@@ -29,16 +30,17 @@ pagar conns manager pagamento = do
       (SQL.execute conn
         "INSERT INTO AMOUNTS (Amount) VALUES (?);" 
         (SQL.Only (PAGVM.amount pagamento)))
-  clientRes <- liftIO $ pagarPeloProcessor manager Default_ pagamentoSync
+  clientRes <- liftIO $ pagarPeloProcessor manager appSettings Default_ pagamentoSync
   _ <- (case clientRes of
-             Left _ ->
+             Left _ -> do
                liftIO $ 
                  reagendarPagamento 
                    conns 
                    manager 
+                   appSettings 
                    1 
                    (fromPaymentVM pagamento requestedAt')
-             Right _ ->
+             Right _ -> do
                liftIO $ salvarPagamento conns Default_ 0 pagamentoSync)
   return S.NoContent
 
@@ -57,8 +59,8 @@ salvarPagamento conns proc retriesCount pagamento = do
              ))
   return ()
   
-reagendarPagamento :: DP.Pool SQL.Connection -> NETWORK.Manager -> Int -> PaymentSync -> IO ()
-reagendarPagamento conns manager retries pagamento = do
+reagendarPagamento :: DP.Pool SQL.Connection -> NETWORK.Manager -> AppSettings -> Int -> PaymentSync -> IO ()
+reagendarPagamento conns manager appSettings retries pagamento = do
   _ <- forkIO $ (
     do
       threadDelay (
@@ -69,15 +71,16 @@ reagendarPagamento conns manager retries pagamento = do
           DP.withResource conns $ \conn ->
             ((SQL.query_ conn "SELECT Amount FROM AMOUNTS ORDER BY Amount DESC;") :: IO [SQL.Only Scientific])
       processor' <- return $ getProcessorToSync retries (amount pagamento) amounts
-      clientRes <- pagarPeloProcessor manager processor' pagamento
+      clientRes <- pagarPeloProcessor manager appSettings processor' pagamento
       _ <- (case clientRes of
-                 Left _ ->
+                 Left _ -> do
                    reagendarPagamento 
                      conns
                      manager
+                     appSettings
                      (retries + 1)
                      pagamento
-                 Right _ ->
+                 Right _ -> do
                    salvarPagamento conns processor' retries pagamento
                    )
       return ()

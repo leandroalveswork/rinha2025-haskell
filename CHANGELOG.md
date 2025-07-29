@@ -11,3 +11,7 @@
 ## 0.8.2 -- 2025-07-28
 
 * Arquivos de automação do Nix de SUBIDA e PARADA do processor-container e Postgres
+
+## 0.9.1 -- 2025-07-29
+
+* Tornar configuravel de chamar qual hostname das APIs de integração

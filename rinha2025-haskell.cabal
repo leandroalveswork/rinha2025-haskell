@@ -1,6 +1,6 @@
 cabal-version:      3.4
 name:               rinha2025-haskell
-version:            0.8.2
+version:            0.9.1
 synopsis:           Implementação da Rinha de Backend de 2025 (Load balancer)
 -- description:
 license:            BSD-3-Clause
@@ -29,6 +29,7 @@ library rinha2025-haskell-lib
                       , Pagamento.ViewModelsLib.ServiceHealthVM
                       , Pagamento.ViewModelsLib.Constants
                       , Pagamento.ViewModelsLib.Processor
+                      , Pagamento.ViewModelsLib.AppSettingsVM
                       , RepositoryLib.Repository
     build-depends:    base ^>= 4.20.0.0
                       , text >= 2.0.2
@@ -70,6 +71,7 @@ executable rinha2025-haskell
                       , Pagamento.ViewModelsLib.ServiceHealthVM
                       , Pagamento.ViewModelsLib.Constants
                       , Pagamento.ViewModelsLib.Processor
+                      , Pagamento.ViewModelsLib.AppSettingsVM
                       , RepositoryLib.Repository
     -- other-extensions:
     build-depends:    base ^>= 4.20.0.0

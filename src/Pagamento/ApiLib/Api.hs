@@ -21,6 +21,7 @@ import Pagamento.ViewModelsLib.PaymentsSummaryVM (PaymentsSummary)
 import Pagamento.ApiLib.Pagar (pagar)
 import Pagamento.ApiLib.ListarPagamentos (listarPagamentos) 
 import Pagamento.ApiLib.ObterPagamentoPorId (obterPagamentoPorId) 
+import Pagamento.ViewModelsLib.AppSettingsVM (AppSettings)
 
 type PagamentoApi = "payments" :> ReqBody '[JSON] Payment
      :> PostNoContent
@@ -29,8 +30,8 @@ type PagamentoApi = "payments" :> ReqBody '[JSON] Payment
   :<|> "payments" :> Capture "id" Int
      :> Get '[JSON] PaymentSync
 
-pagamentoServidor :: DP.Pool SQL.Connection -> NETWORK.Manager -> Server PagamentoApi
-pagamentoServidor conns manager = pagar conns manager
+pagamentoServidor :: DP.Pool SQL.Connection -> NETWORK.Manager -> AppSettings -> Server PagamentoApi
+pagamentoServidor conns manager appSettings = pagar conns manager appSettings
   :<|> listarPagamentos conns
   :<|> obterPagamentoPorId conns
 
