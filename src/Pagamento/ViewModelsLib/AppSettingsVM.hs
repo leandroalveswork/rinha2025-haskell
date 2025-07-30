@@ -1,16 +1,22 @@
 module Pagamento.ViewModelsLib.AppSettingsVM
   ( AppSettings(AppSettings)
   , headServer
-  , defaultHostname
-  , defaultPort
-  , fallbackHostname
-  , fallbackPort
+  , helper1Domain
+  , defaultApiDomain
+  , fallbackApiDomain
+  , Domain(Domain)
+  , dmHostname 
+  , dmPort
   ) where
+
+data Domain = Domain
+  { dmHostname :: String
+  , dmPort :: Int 
+  }
 
 data AppSettings = AppSettings
   { headServer :: Bool
-  , defaultHostname :: String
-  , defaultPort :: Int
-  , fallbackHostname :: String
-  , fallbackPort :: Int
+  , helper1Domain :: Domain
+    , defaultApiDomain :: Domain
+  , fallbackApiDomain :: Domain
   } 

@@ -10,7 +10,7 @@ import qualified Network.HTTP.Client as NETWORK
 import RepositoryLib.Repository (migrateDB, initConnectionPool, dotenvConnstr)
 import Pagamento.ApiLib.Api (PagamentoApi, pagamentoServidor)
 import qualified Pagamento.ViewModelsLib.AppSettingsVM as APPS
-import Pagamento.ViewModelsLib.AppSettingsVM (AppSettings (AppSettings))
+import Pagamento.ViewModelsLib.AppSettingsVM (AppSettings (AppSettings), Domain(Domain), dmHostname, dmPort)
 
 proxyServidor :: Proxy PagamentoApi
 proxyServidor = Proxy
@@ -32,40 +32,38 @@ dotenvHeadServer vars = do
     Nothing              -> fail "Falha ao determinar se o servidor é o HEAD"
     Just validHeadServer -> return $ validHeadServer == 1
 
-dotenvDefaultCaller :: [(String, String)] -> IO (String, Int)
-dotenvDefaultCaller vars = do
-  let hostname = lookup "DEFAULT_API_HOSTNAME" vars
-  let port = (readMaybe $ fromMaybe "80" (lookup "DEFAULT_API_PORT" vars)) :: Maybe Int
+dotenvDomain :: String -> [(String, String)] -> String -> IO Domain
+dotenvDomain key vars errorTextArg = do
+  let hostname = lookup (key ++ "_HOSTNAME") vars
+  let port = (readMaybe $ fromMaybe "80" (lookup (key ++ "_PORT") vars)) :: Maybe Int
   case hostname of
-    Nothing -> fail "Falha ao determinar hostname para a API default"
+    Nothing -> fail $ "Falha ao determinar hostname " ++ errorTextArg
     Just validHostname ->
       case port of
-        Nothing -> fail "Falha ao determinar porta da API default"
-        Just validPort -> return (validHostname, validPort)
+        Nothing -> fail $ "Falha ao determinar porta " ++ errorTextArg
+        Just validPort -> return $ Domain { dmHostname = validHostname, dmPort = validPort }
 
-dotenvFallbackCaller :: [(String, String)] -> IO (String, Int)
-dotenvFallbackCaller vars = do
-  let hostname = lookup "FALLBACK_API_HOSTNAME" vars
-  let port = (readMaybe $ fromMaybe "80" (lookup "FALLBACK_API_PORT" vars)) :: Maybe Int
-  case hostname of
-    Nothing -> fail "Falha ao determinar hostname para a API fallback"
-    Just validHostname ->
-      case port of
-        Nothing -> fail "Falha ao determinar porta da API fallback"
-        Just validPort -> return (validHostname, validPort)
+dotenvHelper1Caller :: [(String, String)] -> IO Domain
+dotenvHelper1Caller vars = dotenvDomain "HELPER_1" vars "para a API do Helper 1"
+
+dotenvDefaultCaller :: [(String, String)] -> IO Domain
+dotenvDefaultCaller vars = dotenvDomain "DEFAULT_API" vars "para a API de default"
+
+dotenvFallbackCaller :: [(String, String)] -> IO Domain
+dotenvFallbackCaller vars = dotenvDomain "FALLBACK_API" vars "para a API de fallback"
 
 appSettings :: IO AppSettings
 appSettings = do
   vars <- ENV.parseFile ".env"
   headServer <- dotenvHeadServer vars
+  helper1Caller <- dotenvHelper1Caller vars
   defaultCaller <- dotenvDefaultCaller vars
   fallbackCaller <- dotenvFallbackCaller vars
   return $ AppSettings
     { APPS.headServer = headServer
-    , APPS.defaultHostname = fst defaultCaller
-    , APPS.defaultPort = snd defaultCaller
-    , APPS.fallbackHostname = fst fallbackCaller
-    , APPS.fallbackPort = snd fallbackCaller
+    , APPS.helper1Domain = helper1Caller
+    , APPS.defaultApiDomain = defaultCaller
+    , APPS.fallbackApiDomain = fallbackCaller
     }
 
 main :: IO ()
