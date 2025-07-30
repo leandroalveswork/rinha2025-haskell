@@ -33,7 +33,7 @@ pagarPeloProcessor manager appSettings processor paymentSync = do
   let port = if processor == Default_ then defaultPort appSettings else fallbackPort appSettings
   SCLI.runClientM
     (pagarPeloProcessor' paymentSync) 
-    (SCLI.mkClientEnv manager (SCLI.BaseUrl SCLI.Http hostname port "payments"))
+    (SCLI.mkClientEnv manager (SCLI.BaseUrl SCLI.Http hostname port ""))
 
 obterSaude :: NETWORK.Manager -> AppSettings -> Processor -> IO (Either SCLI.ClientError ServiceHealth)
 obterSaude manager appSettings processor = do
@@ -41,5 +41,5 @@ obterSaude manager appSettings processor = do
   let port = if processor == Default_ then defaultPort appSettings else fallbackPort appSettings
   SCLI.runClientM
     obterSaude'
-    (SCLI.mkClientEnv manager (SCLI.BaseUrl SCLI.Http hostname port "payments"))
+    (SCLI.mkClientEnv manager (SCLI.BaseUrl SCLI.Http hostname port ""))
 

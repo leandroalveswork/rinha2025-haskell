@@ -6,7 +6,6 @@ module Pagamento.ApiLib.Pagar
   ) where
 
 import Data.Text (Text, pack)
-import Data.Fixed (HasResolution (resolution))
 import Control.Monad.IO.Class (liftIO)
 import Control.Concurrent (forkIO, threadDelay)
 import Data.Scientific
@@ -24,7 +23,7 @@ import Pagamento.ViewModelsLib.AppSettingsVM (AppSettings)
 pagar :: DP.Pool SQL.Connection -> NETWORK.Manager -> AppSettings -> PAGVM.Payment -> S.Handler S.NoContent
 pagar conns manager appSettings pagamento = do
   requestedAt' <- liftIO TIME.getCurrentTime
-  pagamentoSync <- return $ fromPaymentVM pagamento requestedAt'
+  let pagamentoSync = fromPaymentVM pagamento requestedAt'
   _ <- liftIO $
     DP.withResource conns $ \conn ->
       (SQL.execute conn
@@ -63,9 +62,7 @@ reagendarPagamento :: DP.Pool SQL.Connection -> NETWORK.Manager -> AppSettings -
 reagendarPagamento conns manager appSettings retries pagamento = do
   _ <- forkIO $ (
     do
-      threadDelay (
-        1000000 * (fromIntegral $ resolution $ 
-          TIME.nominalDiffTimeToSeconds retentarIntervalo))
+      threadDelay ((floor . (1000000 *) . toRational) retentarIntervalo)
       amounts <- fmap safeAmountsArray $
         fmap (map (\(SQL.Only x) -> x)) $
           DP.withResource conns $ \conn ->

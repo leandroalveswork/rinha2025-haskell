@@ -40,7 +40,7 @@ getProcessorToSync previousRetries amount allAmounts
         else Default_
 
 retentarIntervalo :: TIME.NominalDiffTime
-retentarIntervalo = TIME.secondsToNominalDiffTime 15
+retentarIntervalo = 15
 
 safeAmountsArray :: [Scientific] -> [Scientific]
 safeAmountsArray xs

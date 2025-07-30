@@ -34,9 +34,8 @@ dotenvHeadServer vars = do
 
 dotenvDefaultCaller :: [(String, String)] -> IO (String, Int)
 dotenvDefaultCaller vars = do
-  vars <- ENV.parseFile ".env"
   let hostname = lookup "DEFAULT_API_HOSTNAME" vars
-  let port = (readMaybe $ fromMaybe "80" (lookup "DEFAULT_API_PORT" vars)) >>= readMaybe :: Maybe Int
+  let port = (readMaybe $ fromMaybe "80" (lookup "DEFAULT_API_PORT" vars)) :: Maybe Int
   case hostname of
     Nothing -> fail "Falha ao determinar hostname para a API default"
     Just validHostname ->
@@ -46,7 +45,6 @@ dotenvDefaultCaller vars = do
 
 dotenvFallbackCaller :: [(String, String)] -> IO (String, Int)
 dotenvFallbackCaller vars = do
-  vars <- ENV.parseFile ".env"
   let hostname = lookup "FALLBACK_API_HOSTNAME" vars
   let port = (readMaybe $ fromMaybe "80" (lookup "FALLBACK_API_PORT" vars)) :: Maybe Int
   case hostname of

@@ -20,7 +20,6 @@ library rinha2025-haskell-lib
     exposed-modules:  Pagamento.ApiLib.Api
                       , Pagamento.ApiLib.Pagar
                       , Pagamento.ApiLib.ListarPagamentos
-                      , Pagamento.ApiLib.ObterPagamentoPorId
                       , Pagamento.CallerLib.Caller
                       , Pagamento.ViewModelsLib.PaymentsSummaryVM
                       , Pagamento.ViewModelsLib.PaymentSyncVM
@@ -62,7 +61,6 @@ executable rinha2025-haskell
     other-modules:    Pagamento.ApiLib.Api
                       , Pagamento.ApiLib.Pagar
                       , Pagamento.ApiLib.ListarPagamentos
-                      , Pagamento.ApiLib.ObterPagamentoPorId
                       , Pagamento.CallerLib.Caller
                       , Pagamento.ViewModelsLib.PaymentsSummaryVM
                       , Pagamento.ViewModelsLib.PaymentSyncVM

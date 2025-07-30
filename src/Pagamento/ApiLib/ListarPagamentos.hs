@@ -21,7 +21,9 @@ import Pagamento.ViewModelsLib.PaymentsSummaryVM
   )
 import Pagamento.ViewModelsLib.Processor (processorId, Processor(Default_, Fallback))
 
-listarPagamentos :: DP.Pool SQL.Connection -> TIME.UTCTime -> TIME.UTCTime -> S.Handler PaymentsSummary
+listarPagamentos :: DP.Pool SQL.Connection -> Maybe TIME.UTCTime -> Maybe TIME.UTCTime -> S.Handler PaymentsSummary
+listarPagamentos conns Nothing _ = S.throwError $ S.err404 
+listarPagamentos conns (Just _) Nothing = S.throwError $ S.err404 
 listarPagamentos conns de ate = do
   sumarios <- liftIO $
     DP.withResource conns $ \conn ->
@@ -29,7 +31,7 @@ listarPagamentos conns de ate = do
         (  "SELECT COUNT(PaymentId), SUM(Amount), ProcessorId"
         <> "  FROM PAYMENTS WHERE (CreateTimestamp BETWEEN ? AND ?)"
         <> "    AND Finished = 1"
-        <> "  GROUP BY TunnelId;"
+        <> "  GROUP BY ProcessorId;"
         )
         (de, ate)
         :: IO [(Int, Scientific, Int)])

@@ -15,3 +15,5 @@
 ## 0.9.1 -- 2025-07-29
 
 * Tornar configuravel de chamar qual hostname das APIs de integração
+* Correção de reagendar retentativa corretamente após 15 segundos
+* Correção no Get dos pagamentos
