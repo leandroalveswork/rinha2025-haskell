@@ -25,16 +25,16 @@ processorId Fallback = 2
 retriesBeforeFallback :: Int
 retriesBeforeFallback = 6
 
---                                         allAmounts deve ficar ordenado de forma decrescente
+--                                         allAmounts deve ficar ordenado de forma crescente
 getProcessorToSync :: Int -> Scientific -> [Scientific] -> Processor
-getProcessorToSync previousRetries amount allAmounts 
+getProcessorToSync previousRetries amount allAmounts
   | previousRetries == 0 = Default_
   | previousRetries >= retriesBeforeFallback = Fallback
   | otherwise =
   let leastIndexRequired :: Int
-      leastIndexRequired = (length allAmounts * previousRetries) `div` retriesBeforeFallback
+      leastIndexRequired = (length allAmounts * (retriesBeforeFallback - previousRetries)) `div` retriesBeforeFallback
       safeLeastIndex :: Int
-      safeLeastIndex = min leastIndexRequired (length allAmounts)
+      safeLeastIndex = max leastIndexRequired 0
   in if amount >= (allAmounts !! safeLeastIndex)
         then Fallback
         else Default_

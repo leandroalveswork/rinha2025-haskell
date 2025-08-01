@@ -26,3 +26,4 @@ instance ToJSON PaymentSync
 fromPaymentVM :: PAYVM.Payment -> TIME.UTCTime -> PaymentSync
 fromPaymentVM (PAYVM.Payment { PAYVM.correlationId = correlatId, PAYVM.amount = amount' }) time =
   PaymentSync { correlationId = correlatId, amount = amount', requestedAt = time }
+

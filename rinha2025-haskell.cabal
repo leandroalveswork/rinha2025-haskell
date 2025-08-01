@@ -1,6 +1,6 @@
 cabal-version:      3.4
 name:               rinha2025-haskell
-version:            0.9.1
+version:            0.9.2
 synopsis:           Implementação da Rinha de Backend de 2025 (Load balancer)
 -- description:
 license:            BSD-3-Clause
@@ -18,12 +18,18 @@ common sharedfind
 library rinha2025-haskell-lib
     import:          sharedfind
     exposed-modules:  Pagamento.ApiLib.Api
+                      , Pagamento.ApiLib.ApiType
                       , Pagamento.ApiLib.Pagar
                       , Pagamento.ApiLib.ListarPagamentos
+                      , Pagamento.ApiLib.ReceberTrabalho
+                      , Pagamento.ApiLib.RevisarAgendamentos
                       , Pagamento.CallerLib.Caller
+                      , Pagamento.InternalCallerLib.InternalCaller
+                      , Pagamento.RepositoryLib.FinalizarPagamento
                       , Pagamento.ViewModelsLib.PaymentsSummaryVM
                       , Pagamento.ViewModelsLib.PaymentSyncVM
                       , Pagamento.ViewModelsLib.PaymentVM
+                      , Pagamento.ViewModelsLib.PlanVM
                       , Pagamento.ViewModelsLib.AnyMessageVM
                       , Pagamento.ViewModelsLib.ServiceHealthVM
                       , Pagamento.ViewModelsLib.Constants
@@ -59,12 +65,18 @@ executable rinha2025-haskell
     import:           warnings, sharedfind
     main-is:          Main.hs
     other-modules:    Pagamento.ApiLib.Api
+                      , Pagamento.ApiLib.ApiType
                       , Pagamento.ApiLib.Pagar
                       , Pagamento.ApiLib.ListarPagamentos
+                      , Pagamento.ApiLib.ReceberTrabalho
+                      , Pagamento.ApiLib.RevisarAgendamentos
                       , Pagamento.CallerLib.Caller
+                      , Pagamento.InternalCallerLib.InternalCaller
+                      , Pagamento.RepositoryLib.FinalizarPagamento
                       , Pagamento.ViewModelsLib.PaymentsSummaryVM
                       , Pagamento.ViewModelsLib.PaymentSyncVM
                       , Pagamento.ViewModelsLib.PaymentVM
+                      , Pagamento.ViewModelsLib.PlanVM
                       , Pagamento.ViewModelsLib.AnyMessageVM
                       , Pagamento.ViewModelsLib.ServiceHealthVM
                       , Pagamento.ViewModelsLib.Constants

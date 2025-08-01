@@ -17,3 +17,7 @@
 * Tornar configuravel de chamar qual hostname das APIs de integração
 * Correção de reagendar retentativa corretamente após 15 segundos
 * Correção no Get dos pagamentos
+
+## 0.9.2 -- 2025-08-01
+
+* Processamento em paralelo

@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Pagamento.ViewModelsLib.PaymentsSummaryVM
   ( PaymentsSummary(PaymentsSummary)
@@ -21,6 +22,7 @@ data PaymentSummary = PaymentSummary
   } deriving Generic
 
 instance ToJSON PaymentSummary
+instance FromJSON PaymentSummary
 
 zeroedSummary :: PaymentSummary
 zeroedSummary = PaymentSummary { totalAmount = 0, totalRequests = 0 } 
@@ -34,3 +36,5 @@ instance ToJSON PaymentsSummary where
   toJSON (PaymentsSummary d c) =
     object [(fromString "default") .= d, (fromString "fallback") .= c]
 
+instance FromJSON PaymentsSummary where
+  parseJSON (Object v) = PaymentsSummary <$> v .: "default" <*> v .: "fallback" 

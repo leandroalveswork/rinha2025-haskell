@@ -8,9 +8,11 @@ import Servant
 import qualified Configuration.Dotenv as ENV
 import qualified Network.HTTP.Client as NETWORK 
 import RepositoryLib.Repository (migrateDB, initConnectionPool, dotenvConnstr)
-import Pagamento.ApiLib.Api (PagamentoApi, pagamentoServidor)
+import Pagamento.ApiLib.Api (pagamentoServidor)
+import Pagamento.ApiLib.ApiType (PagamentoApi)
 import qualified Pagamento.ViewModelsLib.AppSettingsVM as APPS
 import Pagamento.ViewModelsLib.AppSettingsVM (AppSettings (AppSettings), Domain(Domain), dmHostname, dmPort)
+import Control.Concurrent (newEmptyMVar)
 
 proxyServidor :: Proxy PagamentoApi
 proxyServidor = Proxy
@@ -43,6 +45,9 @@ dotenvDomain key vars errorTextArg = do
         Nothing -> fail $ "Falha ao determinar porta " ++ errorTextArg
         Just validPort -> return $ Domain { dmHostname = validHostname, dmPort = validPort }
 
+dotenvHeadCaller :: [(String, String)] -> IO Domain
+dotenvHeadCaller vars = dotenvDomain "HEAD" vars "para a API de Head"
+
 dotenvHelper1Caller :: [(String, String)] -> IO Domain
 dotenvHelper1Caller vars = dotenvDomain "HELPER_1" vars "para a API do Helper 1"
 
@@ -56,11 +61,13 @@ appSettings :: IO AppSettings
 appSettings = do
   vars <- ENV.parseFile ".env"
   headServer <- dotenvHeadServer vars
+  headCaller <- dotenvHeadCaller vars
   helper1Caller <- dotenvHelper1Caller vars
   defaultCaller <- dotenvDefaultCaller vars
   fallbackCaller <- dotenvFallbackCaller vars
   return $ AppSettings
     { APPS.headServer = headServer
+    , APPS.headDomain = headCaller
     , APPS.helper1Domain = helper1Caller
     , APPS.defaultApiDomain = defaultCaller
     , APPS.fallbackApiDomain = fallbackCaller
@@ -74,6 +81,7 @@ main = do
   appSettings' <- appSettings
 
   pool <- initConnectionPool connstr
+  mvar <- newEmptyMVar
   manager' <- liftIO (NETWORK.newManager NETWORK.defaultManagerSettings)
   migrateDB (APPS.headServer appSettings') connstr
-  run exposedport (serve proxyServidor $ pagamentoServidor pool manager' appSettings')
+  run exposedport (serve proxyServidor $ pagamentoServidor pool mvar manager' appSettings')
