@@ -1,0 +1,11 @@
+CREATE UNLOGGED TABLE IF NOT EXISTS QA_LOGS 
+  ( PaymentCode VARCHAR(36)
+  , PlanId INTEGER
+  , ServerIdFrom SMALLINT NOT NULL
+  , PlanVersion SMALLINT
+  , CreateTimestamp TIMESTAMP NOT NULL
+  , Message VARCHAR(500) NOT NULL
+  );
+
+INSERT INTO DB_VERSIONS (VersionCode) VALUES ('PGLOG');
+

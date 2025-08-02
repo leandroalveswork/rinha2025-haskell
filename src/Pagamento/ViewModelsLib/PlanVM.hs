@@ -14,10 +14,8 @@ module Pagamento.ViewModelsLib.PlanVM
 import qualified Data.Time as TIME
 import Data.Aeson
 import GHC.Generics
-import Data.Scientific
 
 import qualified Pagamento.ViewModelsLib.PaymentSyncVM as PAYVM
-import Pagamento.ViewModelsLib.AppSettingsVM (AppSettings)
 
 data Plan = Plan
   { planId :: Int

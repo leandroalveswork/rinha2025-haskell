@@ -23,7 +23,7 @@ processorId Default_ = 1
 processorId Fallback = 2
 
 retriesBeforeFallback :: Int
-retriesBeforeFallback = 6
+retriesBeforeFallback = 2
 
 --                                         allAmounts deve ficar ordenado de forma crescente
 getProcessorToSync :: Int -> Scientific -> [Scientific] -> Processor
@@ -40,10 +40,10 @@ getProcessorToSync previousRetries amount allAmounts
         else Default_
 
 retentarIntervalo :: TIME.NominalDiffTime
-retentarIntervalo = 15
+retentarIntervalo = 10
 
 safeAmountsArray :: [Scientific] -> [Scientific]
 safeAmountsArray xs
-  | length xs <= 6 = (reverse . DL.sort) ([1, 10, 100, 1000, 10000, 100000] ++ xs)
+  | length xs <= 6 = (reverse . DL.sort) ([1, 4, 16, 64, 256, 1024] ++ xs)
   | otherwise = xs
 

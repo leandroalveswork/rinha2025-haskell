@@ -6,17 +6,21 @@ module RepositoryLib.Repository
   , initConnectionPool
   , DBConnectionString
   , dotenvConnstr
+  , pgLog
   ) where
 
-import Data.ByteString             (ByteString)
-import Data.String                 (IsString(fromString))
-import Control.Exception           (bracket)
+import Data.ByteString (ByteString)
+import Data.String (IsString(fromString))
+import Control.Exception (bracket)
+import Control.Monad.IO.Class (liftIO)
 
 import qualified System.IO as SIO
 import qualified Data.List as DL
 import qualified Database.PostgreSQL.Simple as SQL
 import qualified Data.Pool as DP
 import qualified Configuration.Dotenv as ENV
+import qualified Data.Time as TIME
+import Pagamento.ViewModelsLib.AppSettingsVM (selfServerId, AppSettings)
 
 type DBConnectionString = ByteString
 
@@ -43,6 +47,12 @@ _migrateDB connstr = bracket (SQL.connectPostgreSQL $ connstr) SQL.close $ \conn
         startQuery <- getFileContentAsSql "START.sql"
         _ <- SQL.execute_ conn startQuery
         return ())
+  (if "PGLOG" `elem` versions
+      then return ()
+      else do
+        startQuery <- getFileContentAsSql "PGLOG.sql"
+        _ <- SQL.execute_ conn startQuery
+        return ())
 
 initConnectionPool :: DBConnectionString -> IO (DP.Pool SQL.Connection)
 initConnectionPool connStr =
@@ -64,3 +74,15 @@ dotenvConnstr = do
    in case connstr of
         Nothing -> fail "Falha ao ler as variáveis de conexão com banco de dados"
         Just okConnstr -> return okConnstr)
+
+pgLog :: DP.Pool SQL.Connection -> AppSettings -> String -> Maybe String -> Maybe Int -> Maybe Int -> Maybe TIME.UTCTime -> IO ()
+pgLog conns appSettings mesg paymCode planId' planVer createTime = do
+  _ <- liftIO $
+    DP.withResource conns $ \conn ->
+      (SQL.execute conn
+           (  "INSERT INTO QA_LOGS (Message, PaymentCode, PlanId, ServerIdFrom, PlanVersion, CreateTimestamp)"
+           <> "  VALUES (?, ?, ?, ?, ?, ?);"
+           )
+           (mesg, paymCode, planId', selfServerId appSettings, planVer, createTime))
+  return ()
+  

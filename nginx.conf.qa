@@ -11,8 +11,8 @@ http {
     error_log /dev/null emerg;
 
     upstream api {
-        server wired-api-01 weight=2;
-        server wired-api-02;
+        server localhost:4061 weight=2;
+        server localhost:4062;
         keepalive 200;
     }
     server {
@@ -25,3 +25,4 @@ http {
         }
     }
 }
+
