@@ -44,6 +44,6 @@ retentarIntervalo = 10
 
 safeAmountsArray :: [Scientific] -> [Scientific]
 safeAmountsArray xs
-  | length xs <= 6 = (reverse . DL.sort) ([1, 10, 100, 1000, 10000, 100000] ++ xs)
+  | length xs <= 6 = (reverse . DL.sort) ([1, 4, 16, 64, 256, 1024] ++ xs)
   | otherwise = xs
 
