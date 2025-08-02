@@ -13,7 +13,7 @@ import qualified Network.HTTP.Client as NETWORK
 import qualified Data.Pool as DP
 import qualified Database.PostgreSQL.Simple as SQL
 import Pagamento.ViewModelsLib.AppSettingsVM (AppSettings)
-import Pagamento.ViewModelsLib.PlanVM (balanceUnprocessed, fromDatabase, planId, planServerId, Plan)
+import Pagamento.ViewModelsLib.PlanVM (balanceUnprocessed, fromDatabase, planId, planServerId, planVersion, Plan)
 import qualified Pagamento.InternalCallerLib.InternalCaller as INCALL
 import Control.Monad (forM_)
 import Data.String (IsString(fromString))
@@ -27,7 +27,7 @@ revisarAgendamentosGenerico receberTrabalho_ conns mvar manager appSettings = do
         planos <- fmap (map fromDatabase) $ liftIO $
           DP.withResource conns $ \conn ->
             (SQL.query_ conn
-              (  "SELECT PlanId, PaymentId, PlanServerId, [Version], FireTimestamp FROM PAYMENT_PLANS"
+              (  "SELECT PL.PlanId, PA.PaymentId, PL.PlanServerId, PlanVersion, FireTimestamp FROM PAYMENT_PLANS PL"
               <> "  INNER JOIN PAYMENTS PA ON PA.PaymentId = PL.PaymentId AND PA.ProcessorId IS NULL;"
               <> "  ORDER BY PL.PaymentId;"
               )
@@ -37,14 +37,12 @@ revisarAgendamentosGenerico receberTrabalho_ conns mvar manager appSettings = do
         if not (null planosNovos)
            then do
               _ <- DP.withResource conns $ \conn ->
-                let parameters = DL.intercalate ", " $ replicate (length planosNovos) "?"
-                in 
-                  (SQL.query conn
+                  (SQL.execute conn
                     (  "UPDATE PAYMENT_PLANS SET "
-                    <> "  [PlanVersion] = [PlanVersion] + 1, PlanServerId = 1 - PlanServerId"
-                    <> "  WHERE PlanId IN " <> fromString parameters <> ";")
+                    <> "  PlanVersion = PlanVersion + 1, PlanServerId = 1 - PlanServerId"
+                    <> "  WHERE PlanId IN ?;")
                     (SQL.Only $ SQL.In (map planId planosNovos))
-                  ):: IO [SQL.Only Int]
+                  )
               forM_ 
                 planosNovos
                 (\plano -> do

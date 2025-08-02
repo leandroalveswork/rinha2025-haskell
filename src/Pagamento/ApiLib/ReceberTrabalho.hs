@@ -7,6 +7,7 @@ module Pagamento.ApiLib.ReceberTrabalho
   ) where
 
 import Data.Scientific (Scientific)
+import qualified Data.List as DL
 import Control.Monad.IO.Class (liftIO)
 import Control.Concurrent (forkIO, threadDelay, MVar)
 import qualified Data.Time as TIME
@@ -15,7 +16,7 @@ import qualified Data.Pool as DP
 import qualified Database.PostgreSQL.Simple as SQL
 import qualified Servant as S
 import Pagamento.ViewModelsLib.PaymentSyncVM (PaymentSync (PaymentSync), correlationId, amount, requestedAt)
-import Pagamento.ViewModelsLib.Processor (getProcessorToSync, retentarIntervalo, safeAmountsArray)
+import Pagamento.ViewModelsLib.Processor (getProcessorToSync, retentarIntervalo, safeAmountsArray, processorId)
 import Pagamento.ViewModelsLib.AppSettingsVM (AppSettings, headServer)
 import Pagamento.CallerLib.Caller (pagarPeloProcessor)
 import qualified Pagamento.InternalCallerLib.InternalCaller as INCALL
@@ -43,7 +44,7 @@ receberTrabalho_ conns mvar manager appSettings (plan@PLAN.Plan
         (SQL.query conn
            (    "SELECT PA.PaymentId, PA.Code, PA.Amount, PA.CreateTimestamp, PA.Retries"
              <> "  FROM PAYMENT_PLANS PL"
-             <> "    INNER JOIN PAYMENTS PA ON PA.PaymentId = PL.PaymentId AND PL.[Version] = ?"
+             <> "    INNER JOIN PAYMENTS PA ON PA.PaymentId = PL.PaymentId AND PL.PlanVersion = ? AND PA.ProcessorId IS NULL"
              <> "    WHERE PlanId = ?;"
              )
            (planVersion, planId)
@@ -71,7 +72,7 @@ receberTrabalho_ conns mvar manager appSettings (plan@PLAN.Plan
                                (TIME.addUTCTime retentarIntervalo fireNow, planId, payId)
                             )
                          _ <- forkIO (chamarRevisarAgendamentos conns mvar manager appSettings)
-                         let newPlan = plan { PLAN.fireTimestamp = fireNow }
+                         let newPlan = plan { PLAN.fireTimestamp = (TIME.addUTCTime retentarIntervalo fireNow) }
                          receberTrabalho_ conns mvar manager appSettings newPlan
                        Right _ -> do
                          finalizarPagamento conns processor' payId
