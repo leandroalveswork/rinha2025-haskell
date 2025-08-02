@@ -22,7 +22,7 @@ type DBConnectionString = ByteString
 
 getFileLines :: String -> IO [String]
 getFileLines fileName = do
-  dataMassFile <- SIO.openFile ("src/RepositoryLib/" ++ fileName) SIO.ReadMode
+  dataMassFile <- SIO.openFile ("scripts/" ++ fileName) SIO.ReadMode
   dataMass <- SIO.hGetContents dataMassFile
   return (lines dataMass)
 

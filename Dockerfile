@@ -33,8 +33,8 @@ COPY --from=build /servidor/bin ./rinha2025-haskell/
 WORKDIR /rinha2025-haskell
 COPY --from=build /servidor/bin/.env ./.env
 
-RUN mkdir -p ./src/RepositoryLib
-COPY src/RepositoryLib/*.sql ./src/RepositoryLib
+RUN mkdir -p ./scripts
+COPY scripts/*.sql ./scripts
 
 EXPOSE 80
 
