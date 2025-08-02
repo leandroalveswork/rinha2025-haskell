@@ -6,7 +6,7 @@ pkgs.mkShell {
   packages = [ rinhaPostgres ];
 
   SHELL_EXIT_HOOK = ''
-    sudo kill -INT `sudo head -1 /usr/local/pgsql/data/postmaster.pid` >/dev/null
+    sudo kill -2 `sudo head -1 /usr/local/pgsql/data/postmaster.pid` >/dev/null
   '';
 
   shellHook = ''
