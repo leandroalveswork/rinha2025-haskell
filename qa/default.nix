@@ -9,7 +9,7 @@ let
   });
 
   processor_container_network = pkgs.callPackage ./processor_container_network.nix { };
-  wired = pkgs.callPackage ./wired.nix { rinhaPostgres = rinhaPostgres; };
+  wired = pkgs.callPackage ./wired.nix { rinhaPostgres = rinhaPostgres; nginx = pkgs.nginx; };
 
   trim_exit_hook = builtins.replaceStrings ["trap \"$SHELL_EXIT_HOOK\" EXIT\n"] [""];
 in
@@ -20,7 +20,7 @@ pkgs.mkShell {
     ${processor_container_network.SHELL_EXIT_HOOK}
   '';
 
-  packages = [ rinhaPostgres ];
+  packages = [ rinhaPostgres pkgs.nginx ];
 
   shellHook = ''
     ${trim_exit_hook processor_container_network.shellHook}
