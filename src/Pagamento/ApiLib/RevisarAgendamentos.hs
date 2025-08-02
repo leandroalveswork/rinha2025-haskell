@@ -28,7 +28,7 @@ revisarAgendamentosGenerico receberTrabalho_ conns mvar manager appSettings = do
           DP.withResource conns $ \conn ->
             (SQL.query_ conn
               (  "SELECT PL.PlanId, PA.PaymentId, PL.PlanServerId, PlanVersion, FireTimestamp FROM PAYMENT_PLANS PL"
-              <> "  INNER JOIN PAYMENTS PA ON PA.PaymentId = PL.PaymentId AND PA.ProcessorId IS NULL;"
+              <> "  INNER JOIN PAYMENTS PA ON PA.PaymentId = PL.PaymentId AND PA.ProcessorId IS NULL"
               <> "  ORDER BY PL.PaymentId;"
               )
             ):: IO [(Int, Int, Int, Int, TIME.UTCTime)]
