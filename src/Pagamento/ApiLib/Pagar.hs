@@ -48,23 +48,26 @@ pagar conns mvar manager appSettings pagamento = do
              , (TIME.addUTCTime retentarIntervalo requestedAt') :: TIME.UTCTime
              )) :: IO [(Int, Int)]
   let (payId, planId) = head paymentRows
-  clientRes <- liftIO $ pagarPeloProcessor manager appSettings Default_ pagamentoSync
-  _ <- (case clientRes of
-             Left _ -> do
-               liftIO $ (do
-                 _ <- forkIO $ chamarRevisarAgendamentos conns mvar manager appSettings
-                 let plan = (PLAN.Plan 
-                                    { PLAN.planId = planId
-                                    , PLAN.paymentId = payId
-                                    , PLAN.planServerId = (selfServerId appSettings)
-                                    , PLAN.planVersion = 1
-                                    , PLAN.fireTimestamp = TIME.addUTCTime retentarIntervalo requestedAt'
-                                    }
-                            )
-                  in receberTrabalho_ conns mvar manager appSettings plan
-                 )
-             Right _ -> do
-               liftIO $ finalizarPagamento conns Default_ payId)
+  _ <- liftIO $ forkIO (
+    do
+      clientRes <- pagarPeloProcessor manager appSettings Default_ pagamentoSync
+      (case clientRes of
+                 Left _ -> do
+                   (do
+                     _ <- forkIO $ chamarRevisarAgendamentos conns mvar manager appSettings
+                     let plan = (PLAN.Plan 
+                                        { PLAN.planId = planId
+                                        , PLAN.paymentId = payId
+                                        , PLAN.planServerId = (selfServerId appSettings)
+                                        , PLAN.planVersion = 1
+                                        , PLAN.fireTimestamp = TIME.addUTCTime retentarIntervalo requestedAt'
+                                        }
+                                )
+                      in receberTrabalho_ conns mvar manager appSettings plan
+                     )
+                 Right _ -> do
+                   finalizarPagamento conns Default_ payId)
+        )
   return S.NoContent
 
 

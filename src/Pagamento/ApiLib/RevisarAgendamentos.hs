@@ -43,21 +43,7 @@ revisarAgendamentosGenerico receberTrabalho_ conns mvar manager appSettings = do
                     <> "  WHERE PlanId IN ?;")
                     (SQL.Only $ SQL.In (map planId planosNovos))
                   )
-              forM_ 
-                planosNovos
-                (\plano -> do
-                  _ <- forkIO $ (
-                      (if planServerId plano == 1
-                          then do
-                            _ <- INCALL.receberTrabalho manager appSettings plano
-                            return ()
-                          else do 
-                            _ <- receberTrabalho_ conns var' manager appSettings plano
-                            return ()
-                      )
-                    )
-                  return ()
-                )
+              return ()
            else return ()
       )
      else return ()
