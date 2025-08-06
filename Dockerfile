@@ -36,6 +36,8 @@ COPY --from=build /servidor/bin/.env ./.env
 RUN mkdir -p ./scripts
 COPY scripts/*.sql ./scripts
 
+RUN ulimit -n 50000
+
 EXPOSE 80
 
 USER www-data:www-data
