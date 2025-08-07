@@ -2,7 +2,7 @@
 pkgs.mkShell {
 
   pname = "rinha_postgresql";
-  version = "0.8.1";
+  version = "1.0.0";
   packages = [ rinhaPostgres ];
 
   SHELL_EXIT_HOOK = ''

@@ -2,7 +2,7 @@
 pkgs.mkShellNoCC {
 
   pname = "processor_container";
-  version = "0.8.1";
+  version = "1.1.0";
   packages = with pkgs; [ docker_28 ];
 
   SHELL_EXIT_HOOK = ''

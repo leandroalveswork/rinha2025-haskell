@@ -2,7 +2,7 @@
 pkgs.mkShell {
 
   pname = "rinha_nginx";
-  version = "0.9.3";
+  version = "1.0.0";
   packages = [ nginx ];
 
   SHELL_EXIT_HOOK = ''
