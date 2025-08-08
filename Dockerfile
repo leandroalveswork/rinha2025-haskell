@@ -34,12 +34,21 @@ WORKDIR /rinha2025-haskell
 COPY --from=build /servidor/bin/.env ./.env
 
 RUN mkdir -p ./scripts
-COPY scripts/*.sql ./scripts
-COPY scripts/env_replacement.sh ./scripts
+COPY scripts/*.sql ./scripts/
+COPY scripts/env_replacement.sh ./scripts/
+RUN chmod +x ./scripts/env_replacement.sh
+
 
 RUN ulimit -n 50000
 
 EXPOSE 80
 
+COPY <<EOF ./start-rinha.sh
+#!/bin/bash
+./scripts/env_replacement.sh && ./rinha2025-haskell
+EOF
+RUN chmod +x ./start-rinha.sh
+RUN chown www-data /rinha2025-haskell
+
 USER www-data:www-data
-ENTRYPOINT ["./scripts/env_replacement.sh && ./rinha2025-haskell"]
+ENTRYPOINT ["./start-rinha.sh"]
