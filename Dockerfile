@@ -35,10 +35,11 @@ COPY --from=build /servidor/bin/.env ./.env
 
 RUN mkdir -p ./scripts
 COPY scripts/*.sql ./scripts
+COPY scripts/env_replacement.sh ./scripts
 
 RUN ulimit -n 50000
 
 EXPOSE 80
 
 USER www-data:www-data
-ENTRYPOINT ["./rinha2025-haskell"]
+ENTRYPOINT ["./scripts/env_replacement.sh && ./rinha2025-haskell"]

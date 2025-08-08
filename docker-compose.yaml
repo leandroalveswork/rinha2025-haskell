@@ -1,10 +1,8 @@
 services:
   api01: &api
-    build: 
-      context: .
-      args:
-        STAGE: prd
-        HEAD_SERVER: 1
+    build: .
+    environment:
+      HEAD_SERVER: 1
     hostname: wired-api-01
     expose:
       - 80
@@ -22,11 +20,8 @@ services:
   
   api02:
     <<: *api
-    build: 
-      context: .
-      args:
-        STAGE: prd
-        HEAD_SERVER: 0
+    environment:
+      HEAD_SERVER: 0
     hostname: wired-api-02
     expose:
       - 80

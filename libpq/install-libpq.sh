@@ -1,3 +1,4 @@
+#!/bin/bash
 # Keys
 apt -y install curl ca-certificates
 install -d /usr/share/postgresql-common/pgdg
